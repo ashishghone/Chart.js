@@ -365,28 +365,32 @@ module.exports = function(Chart) {
 					ctx.strokeStyle = valueOrDefault(legendItem.strokeStyle, globalDefault.defaultColor);
 					var isLineWidthZero = (valueOrDefault(legendItem.lineWidth, lineDefault.borderWidth) === 0);
 
-					if (ctx.setLineDash) {
-						// IE 9 and 10 do not support line dash
-						ctx.setLineDash(valueOrDefault(legendItem.lineDash, lineDefault.borderDash));
-					}
-
 					if (opts.labels && opts.labels.usePointStyle) {
-						// Recalculate x and y for drawPoint() because its expecting
-						// x and y to be center of figure (instead of top left)
-						var radius = fontSize * Math.SQRT2 / 2;
-						var offSet = radius / Math.SQRT2;
-						var centerX = x + offSet;
-						var centerY = y + offSet;
+                        // Recalculate x and y for drawPoint() because its expecting
+                        // x and y to be center of figure (instead of top left)
+                        var radius = fontSize / 2;
+                        var offSet = radius ;
+                        var centerX = x + offSet*2;
+                        var centerY = y + offSet;
+                        if (legendItem.hidden) {
+                            ctx.beginPath();
+                            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                            ctx.stroke();                       
+                        }
+                        else{
+                        // Draw pointStyle as legend symbol
+                        helpers.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY);
+                        }
+                        
 
-						// Draw pointStyle as legend symbol
-						helpers.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY);
-					} else {
-						// Draw box as legend symbol
-						if (!isLineWidthZero) {
-							ctx.strokeRect(x, y, boxWidth, fontSize);
-						}
-						ctx.fillRect(x, y, boxWidth, fontSize);
-					}
+                    } else {
+                        // Draw box as legend symbol
+                        if (!isLineWidthZero) {
+                            ctx.strokeRect(x, y, boxWidth, fontSize);
+                        }
+                        ctx.fillRect(x, y, boxWidth, fontSize);
+                    }
+
 
 					ctx.restore();
 				};
@@ -399,11 +403,11 @@ module.exports = function(Chart) {
 
 					if (legendItem.hidden) {
 						// Strikethrough the text if hidden
-						ctx.beginPath();
-						ctx.lineWidth = 2;
-						ctx.moveTo(xLeft, yMiddle);
-						ctx.lineTo(xLeft + textWidth, yMiddle);
-						ctx.stroke();
+						//ctx.beginPath();
+						//ctx.lineWidth = 2;
+						//ctx.moveTo(xLeft, yMiddle);
+						//ctx.lineTo(xLeft + textWidth, yMiddle);
+						//ctx.stroke();
 					}
 				};
 
